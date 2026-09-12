@@ -1,0 +1,30 @@
+{
+  "name": "messenger-bot",
+  "version": "1.0.0",
+  "description": "Dự án Bot Facebook Messenger tài khoản cá nhân (Userbot) tích hợp AI Gemini, tải nhạc SoundCloud/Spotify và tải video TikTok",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [
+    "messenger-bot",
+    "facebook-bot",
+    "userbot",
+    "gemini-ai",
+    "tiktok-downloader",
+    "music-downloader"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@google/genai": "^2.21.0",
+    "@napi-rs/canvas": "^1.0.9",
+    "axios": "^1.20.0",
+    "dotenv": "^17.4.2",
+    "play-dl": "^1.9.7",
+    "spotify-url-info": "^3.3.3",
+    "ws3-fca": "^3.5.2"
+  }
+}

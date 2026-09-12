@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: messenger-bot
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_OPTIONS
+        value: "--dns-result-order=ipv4first --no-network-family-autoselection"
+      - key: BOT_PREFIX
+        value: "!"
+      - key: AUTO_REPLY_AI
+        value: "false"
+      - key: GEMINI_MODEL
+        value: "gemini-3.1-flash-lite"
+      - key: AI_HISTORY_LIMIT
+        value: "8"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: FB_APPSTATE
+        sync: false
