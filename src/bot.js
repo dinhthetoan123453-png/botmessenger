@@ -62,7 +62,7 @@ function isBotSystemMessage(content) {
  * Khởi động lắng nghe tin nhắn qua MQTT và phân phối lệnh
  * @param {object} api - Instance FCA đã đăng nhập
  */
-function startBot(api) {
+function startBot(api, onFatalError = null) {
   // 1. Tải danh sách các lệnh từ thư mục commands
   loadCommands();
 
@@ -71,7 +71,19 @@ function startBot(api) {
   // 2. Bắt đầu lắng nghe sự kiện MQTT
   api.listenMqtt(async (err, event) => {
     if (err) {
-      logger.error('Lỗi nhận sự kiện MQTT:', err.message || err);
+      const errMsg = err.message || String(err);
+      logger.error('Lỗi nhận sự kiện MQTT:', errMsg);
+
+      // Nhận diện các lỗi mất kết nối nghiêm trọng hoặc AppState hết hạn
+      const isFatal = errMsg.includes('Failed to get sequence ID') ||
+                      errMsg.includes('Connection refused') ||
+                      errMsg.includes('Server unavailable') ||
+                      errMsg.includes('Not logged in') ||
+                      errMsg.includes('invalid appstate');
+
+      if (isFatal && typeof onFatalError === 'function') {
+        onFatalError(err);
+      }
       return;
     }
 

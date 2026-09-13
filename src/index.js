@@ -35,11 +35,12 @@ server = http.createServer((req, res) => {
 
   // 1. Health Check Endpoint cho Render / Railway / UptimeRobot
   if (url === '/health' || url === '/ping') {
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+    const isOk = botState.status === 'ONLINE';
+    res.writeHead(isOk ? 200 : 503, { 'Content-Type': 'application/json; charset=utf-8' });
     return res.end(JSON.stringify({
-      status: botState.status === 'ONLINE' ? 'ok' : (botState.status === 'ERROR' ? 'error' : 'starting'),
+      status: isOk ? 'ok' : (botState.status === 'ERROR' ? 'error' : 'starting'),
       uptime: Math.floor(process.uptime()),
-      message: botState.status === 'ONLINE' ? 'Messenger Bot is running' : `Messenger Bot status: ${botState.status}`,
+      message: isOk ? 'Messenger Bot is running' : `Messenger Bot status: ${botState.status} - ${botState.error || ''}`,
       botId: botState.botId,
     }));
   }
@@ -146,7 +147,15 @@ async function main() {
     const api = await authenticate();
     botState.status = 'ONLINE';
     botState.botId = api.getCurrentUserID();
-    startBot(api);
+    startBot(api, (fatalErr) => {
+      botState.status = 'ERROR';
+      botState.error = fatalErr?.message || 'Mất kết nối MQTT hoặc AppState đã hết hạn.';
+      logger.warn('Phát hiện sự cố kết nối nghiêm trọng. Bot sẽ tự khởi động lại sau 10 giây...');
+      setTimeout(() => {
+        logger.info('Tiến hành thoát tiến trình để Render tự động khởi động lại...');
+        process.exit(1);
+      }, 10000);
+    });
   } catch (error) {
     const errMsg = error.message || String(error);
     botState.status = 'ERROR';
