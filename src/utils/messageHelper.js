@@ -11,7 +11,7 @@ const logger = require('./logger');
  * @param {string|number} threadId - ID hội thoại
  * @param {string} [replyToMessageId] - ID tin nhắn cần trích dẫn/trả lời
  */
-async function safeSendMessage(api, payload, threadId, replyToMessageId = null) {
+async function safeSendMessage(api, payload, threadId, replyToMessageId = null, isSingleUser = null) {
   if (!api || !threadId) return null;
 
   let msgObj = {};
@@ -59,31 +59,52 @@ async function safeSendMessage(api, payload, threadId, replyToMessageId = null) 
     return null;
   }
 
+  // Xác định xem có phải là chat riêng 1-1 không (isSingleUser)
+  let isSingle = isSingleUser;
+  if (typeof isSingle !== 'boolean') {
+    if (typeof payload === 'object' && payload !== null) {
+      if (typeof payload.isSingleUser === 'boolean') isSingle = payload.isSingleUser;
+      else if (typeof payload.isGroup === 'boolean') isSingle = !payload.isGroup;
+    }
+  }
+
+  // Hàm hỗ trợ gửi tin nhắn qua ws3-fca api.sendMessage
+  async function attemptSend(singleUserFlag, replyId) {
+    return await api.sendMessage(msgObj, String(threadId), replyId, singleUserFlag);
+  }
+
+  // Chiến lược gửi:
+  // Nếu đã biết rõ (isSingle !== null): thử với giá trị đó trước.
+  // Nếu chưa biết: thử gửi dạng nhóm (false), nếu lỗi 1545012 sẽ tự động chuyển sang 1-1 (true).
+  const primarySingle = isSingle === true;
+  const secondarySingle = !primarySingle;
+
   try {
-    return await api.sendMessage(msgObj, String(threadId), targetReplyId);
+    return await attemptSend(primarySingle, targetReplyId);
   } catch (err) {
-    if (targetReplyId) {
-      logger.warn(`Gửi tin nhắn kèm trích dẫn (${targetReplyId}) thất bại: ${err.message}. Đang thử lại không trích dẫn...`);
-      try {
-        return await api.sendMessage(msgObj, String(threadId));
-      } catch (innerErr) {
-        if (typeof api.sendMessageMqtt === 'function' && !msgObj.attachment) {
-          try {
-            logger.info('Đang chuyển sang gửi qua MQTT channel (/ls_req)...');
-            return await api.sendMessageMqtt(msgObj, String(threadId));
-          } catch (_) {}
-        }
-        logger.error('Thử lại gửi tin nhắn không trích dẫn vẫn thất bại:', innerErr.message || innerErr);
-        throw innerErr;
-      }
-    } else {
-      if (typeof api.sendMessageMqtt === 'function' && !msgObj.attachment) {
+    logger.warn(`Lần gửi 1 tới ${threadId} (isSingleUser=${primarySingle}, reply=${!!targetReplyId}) thất bại: ${err.message || err}`);
+
+    // Thử lại lần 2: Đổi chế độ giữa 1-1 và Group
+    try {
+      logger.info(`Đang thử lại chế độ ngược lại (isSingleUser=${secondarySingle})...`);
+      return await attemptSend(secondarySingle, targetReplyId);
+    } catch (flipErr) {
+      // Thử lại lần 3: Nếu có kèm reply ID thì thử bỏ reply ID (gửi tin nhắn thông thường)
+      if (targetReplyId) {
         try {
-          logger.info('Đang chuyển sang gửi qua MQTT channel (/ls_req)...');
-          return await api.sendMessageMqtt(msgObj, String(threadId));
-        } catch (_) {}
+          logger.info(`Đang thử lại không kèm trích dẫn (isSingleUser=${primarySingle})...`);
+          return await attemptSend(primarySingle, null);
+        } catch (_) {
+          try {
+            logger.info(`Đang thử lại không kèm trích dẫn (isSingleUser=${secondarySingle})...`);
+            return await attemptSend(secondarySingle, null);
+          } catch (finalErr) {
+            logger.error(`Tất cả các lần thử gửi tin nhắn tới ${threadId} đều thất bại:`, finalErr.message || finalErr);
+            throw finalErr;
+          }
+        }
       }
-      throw err;
+      throw flipErr;
     }
   }
 }

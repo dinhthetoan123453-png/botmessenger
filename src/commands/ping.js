@@ -6,7 +6,7 @@ module.exports = {
   name: 'ping',
   description: 'Kiểm tra trạng thái bot và thời gian phản hồi',
   usage: '!ping',
-  async execute({ api, message, threadId }) {
+  async execute({ api, message, threadId, isGroup }) {
     const msgTimestamp = message?.timestamp ? parseInt(message.timestamp, 10) : Date.now();
     const latency = Date.now() - msgTimestamp;
     const uptimeSec = Math.floor((Date.now() - startTime) / 1000);
@@ -19,6 +19,6 @@ module.exports = {
       `• Thời gian hoạt động: ${hours}h ${minutes}m ${seconds}s\n` +
       `• Trạng thái: Trực tuyến (Online)`;
 
-    await safeSendMessage(api, replyMsg, threadId, message?.messageID);
+    await safeSendMessage(api, replyMsg, threadId, message?.messageID, isGroup !== undefined ? !isGroup : null);
   },
 };

@@ -4,18 +4,19 @@ module.exports = {
   name: 'echo',
   description: 'Lặp lại nội dung bạn vừa nhập',
   usage: '!echo <nội dung>',
-  async execute({ api, message, args, threadId }) {
+  async execute({ api, message, args, threadId, isGroup }) {
     if (!args || args.length === 0) {
       await safeSendMessage(
         api,
         '📌 Vui lòng nhập nội dung muốn lặp lại. Ví dụ: !echo Xin chào Messenger Bot',
         threadId,
-        message?.messageID
+        message?.messageID,
+        isGroup !== undefined ? !isGroup : null
       );
       return;
     }
 
     const textToEcho = args.join(' ');
-    await safeSendMessage(api, `📢 Echo: ${textToEcho}`, threadId, message?.messageID);
+    await safeSendMessage(api, `📢 Echo: ${textToEcho}`, threadId, message?.messageID, isGroup !== undefined ? !isGroup : null);
   },
 };

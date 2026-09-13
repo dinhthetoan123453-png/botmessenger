@@ -141,6 +141,7 @@ function startBot(api) {
               args,
               threadId,
               isGroup,
+              isSingleUser: !isGroup,
             });
           } finally {
             if (typeof api.sendTypingIndicator === 'function') {
@@ -164,7 +165,8 @@ function startBot(api) {
               api,
               `Lệnh '${prefixUsed}${commandName}' không tồn tại. Gõ '${prefixUsed}help' để xem danh sách lệnh.`,
               threadId,
-              event.messageID
+              event.messageID,
+              true
             );
 
             if (typeof api.sendTypingIndicator === 'function') {

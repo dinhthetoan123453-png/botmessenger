@@ -9,7 +9,7 @@ module.exports = {
   aliases: ['ad', 'owner'],
   description: 'Hiển thị thẻ thông tin quản trị viên và chủ sở hữu bot (@toandinh27210)',
   usage: '!admin',
-  async execute({ api, message, threadId }) {
+  async execute({ api, message, threadId, isGroup }) {
     const adminId = config.adminId || '100083611166883';
     const adminName = config.adminName || 'Toàn Đinh';
     const adminTag = config.adminTag || '@toandinh27210';
@@ -60,7 +60,8 @@ module.exports = {
           attachments: [cardResult.imagePath],
         },
         threadId,
-        message?.messageID
+        message?.messageID,
+        isGroup !== undefined ? !isGroup : null
       );
     } catch (err) {
       logger.error('Lỗi khi tạo ảnh admin card, gửi fallback text:', err.message || err);
@@ -74,7 +75,7 @@ module.exports = {
         `• Trang cá nhân: ${adminFacebook}\n` +
         `• Hỗ trợ: Nhắn tin trực tiếp qua Facebook hoặc tag ${adminTag} trong nhóm nhé!`;
 
-      await safeSendMessage(api, fallbackMsg, threadId, message?.messageID);
+      await safeSendMessage(api, fallbackMsg, threadId, message?.messageID, isGroup !== undefined ? !isGroup : null);
     } finally {
       if (cardResult && typeof cardResult.cleanup === 'function') {
         cardResult.cleanup();

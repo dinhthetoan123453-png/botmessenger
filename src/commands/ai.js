@@ -14,7 +14,7 @@ module.exports = {
   name: 'ai',
   description: 'Hỏi đáp với AI Google Gemini (đọc 8 tin nhắn gần nhất để nắm bắt ngữ cảnh)',
   usage: '!ai [câu hỏi hoặc để trống để AI phản hồi theo ngữ cảnh]',
-  async execute({ api, message, args, threadId, isAutoReply = false }) {
+  async execute({ api, message, args, threadId, isGroup, isAutoReply = false }) {
     if (!config.geminiApiKey) {
       await safeSendMessage(
         api,
@@ -142,14 +142,15 @@ Quy tắc phản hồi tối ưu:
       });
 
       // 5. Gửi câu trả lời về cho người dùng qua Messenger
-      await safeSendMessage(api, replyText, threadId, message?.messageID);
+      await safeSendMessage(api, replyText, threadId, message?.messageID, isGroup !== undefined ? !isGroup : null);
     } catch (err) {
       logger.error('Lỗi khi gọi Gemini API:', err);
       await safeSendMessage(
         api,
         `❌ Lỗi xử lý AI: ${err.message || 'Không thể kết nối đến máy chủ AI.'}`,
         threadId,
-        message?.messageID
+        message?.messageID,
+        isGroup !== undefined ? !isGroup : null
       );
     } finally {
       if (typeof api.sendTypingIndicator === 'function') {

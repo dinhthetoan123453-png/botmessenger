@@ -5,7 +5,7 @@ module.exports = {
   name: 'help',
   description: 'Hiển thị danh sách tất cả các lệnh của bot',
   usage: '!help',
-  async execute({ api, message, threadId }) {
+  async execute({ api, message, threadId, isGroup }) {
     const botId = typeof api?.getCurrentUserID === 'function' ? api.getCurrentUserID() : '61593936857305';
 
     const helpText = `DANH SÁCH LỆNH MESSENGER BOT:
@@ -42,6 +42,6 @@ module.exports = {
 👑 Quản trị viên: Toàn Đinh (@toandinh27210)
 💡 Mẹo: Bạn có thể dùng dấu "!" hoặc "/" ở đầu mỗi lệnh. Trong chat 1-1 với bot, bạn có thể gửi thẳng link TikTok để bot tự động tải!`;
 
-    await safeSendMessage(api, helpText, threadId, message?.messageID);
+    await safeSendMessage(api, helpText, threadId, message?.messageID, isGroup !== undefined ? !isGroup : null);
   },
 };
