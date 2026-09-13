@@ -47,8 +47,8 @@ async function handleGroupEvent({ api, event }) {
         await sleep(getRandomDelay(config.safeDelayMin, config.safeDelayMax));
         await safeSendMessage(
           api,
-          `🤖 Xin chào cả nhà! Cảm ơn mọi người đã thêm Bot vào nhóm chat [${threadName}].\n` +
-          `👉 Gõ !help để xem danh sách toàn bộ các tính năng và lệnh hữu ích của bot nhé!`,
+          `Xin chào cả nhà! Cảm ơn mọi người đã thêm Bot vào nhóm chat [${threadName}].\n` +
+          `Gõ !help để xem danh sách toàn bộ các tính năng và lệnh hữu ích của bot nhé!`,
           threadId
         );
         continue;
@@ -72,9 +72,9 @@ async function handleGroupEvent({ api, event }) {
           name,
           uid: userId,
           cardTheme: 'welcome',
-          badgeTitle: '★ WELCOME TO THE GROUP ★',
+          badgeTitle: 'WELCOME TO THE GROUP',
           badgeColor: '#34d399',
-          subtitle: '★ Chào Mừng Gia Nhập Nhóm! ★',
+          subtitle: 'Chào Mừng Gia Nhập Nhóm!',
           subtitleColor: '#34d399',
           avatarUrl,
           gender: genderText,
@@ -89,10 +89,10 @@ async function handleGroupEvent({ api, event }) {
           ],
         });
 
-        const welcomeCaption = `🎉 CHÀO MỪNG THÀNH VIÊN MỚI!\n` +
-          `Chào mừng [${name}] đã gia nhập vào nhóm chat [${threadName}]! ✨\n` +
+        const welcomeCaption = `CHÀO MỪNG THÀNH VIÊN MỚI!\n` +
+          `Chào mừng [${name}] đã gia nhập vào nhóm chat [${threadName}]!\n` +
           `Chúc bạn có những giây phút trò chuyện, giao lưu thật vui vẻ cùng mọi người nha!\n` +
-          `💡 Gõ !help để xem danh sách lệnh của bot.`;
+          `Gõ !help để xem danh sách lệnh của bot.`;
 
         await safeSendMessage(
           api,
@@ -150,9 +150,9 @@ async function handleGroupEvent({ api, event }) {
         name: leftUserName,
         uid: leftUserId,
         cardTheme: 'goodbye',
-        badgeTitle: '★ GOODBYE & FAREWELL ★',
+        badgeTitle: 'GOODBYE & FAREWELL',
         badgeColor: '#fb7185',
-        subtitle: '★ Tạm Biệt & Hẹn Gặp Lại! ★',
+        subtitle: 'Tạm Biệt & Hẹn Gặp Lại!',
         subtitleColor: '#fb7185',
         avatarUrl,
         gender: genderText,
@@ -167,9 +167,9 @@ async function handleGroupEvent({ api, event }) {
         ],
       });
 
-      const goodbyeCaption = `👋 TẠM BIỆT VÀ HẸN GẶP LẠI!\n` +
+      const goodbyeCaption = `TẠM BIỆT VÀ HẸN GẶP LẠI!\n` +
         `Thành viên [${leftUserName}] đã rời khỏi nhóm chat [${threadName}].\n` +
-        `Cảm ơn những kỉ niệm cùng mọi người và chúc bạn luôn gặp nhiều may mắn, thành công trên con đường phía trước! 🌟`;
+        `Cảm ơn những kỉ niệm cùng mọi người và chúc bạn luôn gặp nhiều may mắn, thành công trên con đường phía trước!`;
 
       await safeSendMessage(
         api,

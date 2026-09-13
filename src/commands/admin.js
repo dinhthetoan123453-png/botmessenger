@@ -25,11 +25,11 @@ module.exports = {
       cardResult = await generateInfoCard({
         name: adminName,
         uid: adminId,
-        badgeTitle: '★ BOT OWNER & DEVELOPER ★',
+        badgeTitle: 'BOT OWNER & DEVELOPER',
         badgeColor: '#fbbf24',
         badgeBorder: 'rgba(251, 191, 36, 0.65)',
         badgeBg: 'rgba(30, 20, 10, 0.85)',
-        subtitle: '★ Quản Trị Viên & Tác Giả Bot',
+        subtitle: 'Quản Trị Viên & Tác Giả Bot',
         subtitleColor: '#fbbf24',
         avatarUrl,
         gender: 'Nam',
@@ -43,7 +43,7 @@ module.exports = {
         ],
       });
 
-      const caption = `👑 THÔNG TIN QUẢN TRỊ VIÊN BOT (ADMIN):\n` +
+      const caption = `THÔNG TIN QUẢN TRỊ VIÊN BOT (ADMIN):\n` +
         `• Họ và tên: ${adminName}\n` +
         `• Biệt danh / Tag: ${adminTag}\n` +
         `• Facebook UID: ${adminId}\n` +
@@ -66,7 +66,7 @@ module.exports = {
     } catch (err) {
       logger.error('Lỗi khi tạo ảnh admin card, gửi fallback text:', err.message || err);
 
-      const fallbackMsg = `👑 THÔNG TIN QUẢN TRỊ VIÊN BOT (ADMIN):\n` +
+      const fallbackMsg = `THÔNG TIN QUẢN TRỊ VIÊN BOT (ADMIN):\n` +
         `• Họ và tên: ${adminName}\n` +
         `• Biệt danh / Tag: ${adminTag}\n` +
         `• Facebook UID: ${adminId}\n` +

@@ -26,21 +26,34 @@ function getRandomDelay(min, max) {
 function isBotSystemMessage(content) {
   if (!content || typeof content !== 'string') return false;
   const text = content.trim();
-  return text.startsWith('🏓 Pong!') ||
+  return text.startsWith('Pong!') ||
+         text.startsWith('🏓 Pong!') ||
+         text.startsWith('Echo:') ||
          text.startsWith('📢 Echo:') ||
+         text.startsWith('[THÔNG TIN BÀI HÁT]') ||
          text.startsWith('🎵 [THÔNG TIN BÀI HÁT]') ||
+         text.startsWith('[THÔNG TIN VIDEO TIKTOK]') ||
          text.startsWith('🎬 [THÔNG TIN VIDEO TIKTOK]') ||
+         text.startsWith('THÔNG TIN QUẢN TRỊ VIÊN') ||
+         text.startsWith('Thẻ thông tin') ||
+         text.startsWith('Đang ') ||
          text.startsWith('⏳ Đang') ||
+         text.startsWith('Video:') ||
          text.startsWith('🎥 Video:') ||
          text.startsWith('⚠️ ') ||
          text.startsWith('❌ ') ||
          text.startsWith('📌 ') ||
+         text.startsWith('Audio:') ||
          text.startsWith('🎶 Audio:') ||
          text.startsWith('DANH SÁCH LỆNH') ||
-         text.startsWith('🤖 DANH SÁCH LỆNH') ||
-         text.startsWith('ℹ️ THÔNG TIN CUỘC TRÒ CHUYỆN:') ||
+         text.startsWith('THÔNG TIN CUỘC TRÒ CHUYỆN:') ||
+         text.startsWith('Hướng dẫn sử dụng') ||
+         text.startsWith('Đã đổi biệt danh') ||
+         text.startsWith('Đã xóa biệt danh') ||
+         text.startsWith('Không thể đổi') ||
          text.startsWith("Lệnh '") ||
          text.startsWith('Lỗi ') ||
+         text.startsWith('[LỊCH SỬ') ||
          text.startsWith('📋 [LỊCH SỬ') ||
          text.startsWith('Vui lòng nhập');
 }

@@ -11,7 +11,7 @@ module.exports = {
     if (!args || args.length === 0) {
       await safeSendMessage(
         api,
-        '📌 Vui lòng nhập tên bài hát hoặc link Spotify / SoundCloud.\nVí dụ: !music Chúng ta của tương lai',
+        'Vui lòng nhập tên bài hát hoặc link Spotify / SoundCloud.\nVí dụ: !music Chúng ta của tương lai',
         threadId,
         message?.messageID
       );
@@ -23,7 +23,7 @@ module.exports = {
     // Thông báo đang xử lý
     await safeSendMessage(
       api,
-      `⏳ Đang tìm kiếm và xử lý bài hát: "${query}". Vui lòng đợi trong giây lát...`,
+      `Đang tìm kiếm và xử lý bài hát: "${query}". Vui lòng đợi trong giây lát...`,
       threadId,
       message?.messageID
     );
@@ -35,7 +35,7 @@ module.exports = {
       if (!result) {
         await safeSendMessage(
           api,
-          `❌ Không tìm thấy bài hát nào với từ khóa: "${query}".`,
+          `Không tìm thấy bài hát nào với từ khóa: "${query}".`,
           threadId,
           message?.messageID
         );
@@ -45,7 +45,7 @@ module.exports = {
       logger.info(`Tìm thấy bài hát: ${result.title} - ${result.artist}`);
 
       // 1. Gửi ảnh bìa kèm thông tin bài hát
-      const infoMsg = `🎵 [THÔNG TIN BÀI HÁT]\n` +
+      const infoMsg = `[THÔNG TIN BÀI HÁT]\n` +
         `• Tên: ${result.title}\n` +
         `• Nghệ sĩ: ${result.artist}\n` +
         `• Nguồn: ${result.source}\n` +
@@ -71,7 +71,7 @@ module.exports = {
         await safeSendMessage(
           api,
           {
-            body: `🎶 Audio: ${result.title}.mp3`,
+            body: `Audio: ${result.title}.mp3`,
             attachments: [result.audioPath],
           },
           threadId
@@ -81,7 +81,7 @@ module.exports = {
       logger.error('Lỗi khi tìm hoặc gửi nhạc:', err.message || err);
       await safeSendMessage(
         api,
-        `❌ Có lỗi xảy ra khi tải bài hát: ${err.message || 'Lỗi không xác định'}`,
+        `Có lỗi xảy ra khi tải bài hát: ${err.message || 'Lỗi không xác định'}`,
         threadId,
         message?.messageID
       );

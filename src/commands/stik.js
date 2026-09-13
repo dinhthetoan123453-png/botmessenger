@@ -11,7 +11,7 @@ module.exports = {
     if (!args || args.length === 0) {
       await safeSendMessage(
         api,
-        '📌 Vui lòng nhập liên kết video TikTok cần tải.\n\nVí dụ:\n!stik https://vt.tiktok.com/ZSqUturPA/\n!stik https://www.tiktok.com/@tiktok/video/7106594312292453675',
+        'Vui lòng nhập liên kết video TikTok cần tải.\n\nVí dụ:\n!stik https://vt.tiktok.com/ZSqUturPA/\n!stik https://www.tiktok.com/@tiktok/video/7106594312292453675',
         threadId,
         message?.messageID
       );
@@ -24,7 +24,7 @@ module.exports = {
     if (!tiktokUrl) {
       await safeSendMessage(
         api,
-        '❌ Không tìm thấy liên kết TikTok hợp lệ trong tin nhắn của bạn. Vui lòng kiểm tra lại liên kết.',
+        'Không tìm thấy liên kết TikTok hợp lệ trong tin nhắn của bạn. Vui lòng kiểm tra lại liên kết.',
         threadId,
         message?.messageID
       );
@@ -36,7 +36,7 @@ module.exports = {
       // Gửi thông báo bắt đầu xử lý
       await safeSendMessage(
         api,
-        '⏳ Đang tải và xử lý video TikTok không logo, vui lòng đợi trong giây lát...',
+        'Đang tải và xử lý video TikTok không logo, vui lòng đợi trong giây lát...',
         threadId,
         message?.messageID
       );
@@ -46,7 +46,7 @@ module.exports = {
       if (!result) {
         await safeSendMessage(
           api,
-          '❌ Không thể xử lý video TikTok này. Vui lòng thử lại sau.',
+          'Không thể xử lý video TikTok này. Vui lòng thử lại sau.',
           threadId,
           message?.messageID
         );
@@ -56,13 +56,13 @@ module.exports = {
       logger.info(`Đã xử lý xong thông tin video TikTok: "${result.title}" của [${result.author}]`);
 
       // 1. Gửi thông tin chi tiết của video (kèm ảnh bìa và link tải trực tiếp không logo)
-      const infoMsg = `🎬 [THÔNG TIN VIDEO TIKTOK]\n` +
-        `👤 Tác giả: ${result.author}\n` +
-        `📝 Tiêu đề: ${result.title}\n` +
-        `⏱️ Thời lượng: ${result.duration}\n` +
-        `🎵 Âm nhạc: ${result.music}\n` +
-        `📊 Tương tác: ❤️ ${result.likes} | 💬 ${result.comments} | 👁️ ${result.views}\n` +
-        `🔗 Link xem trực tiếp không logo:\n${result.downloadUrl}`;
+      const infoMsg = `[THÔNG TIN VIDEO TIKTOK]\n` +
+        `• Tác giả: ${result.author}\n` +
+        `• Tiêu đề: ${result.title}\n` +
+        `• Thời lượng: ${result.duration}\n` +
+        `• Âm nhạc: ${result.music}\n` +
+        `• Tương tác: ${result.likes} thích | ${result.comments} bình luận | ${result.views} lượt xem\n` +
+        `• Link tải trực tiếp không logo:\n${result.downloadUrl}`;
 
       let infoSent = false;
       if (result.coverPath) {
@@ -90,7 +90,7 @@ module.exports = {
       if (result.videoPath) {
         try {
           logger.info(`Đang tải tệp video TikTok lên đoạn chat Messenger: ${result.videoPath}`);
-          const caption = `🎥 Video: ${result.title.slice(0, 100)}`;
+          const caption = `Video: ${result.title.slice(0, 100)}`;
           await safeSendMessage(
             api,
             {
@@ -104,7 +104,7 @@ module.exports = {
           logger.warn('Không thể gửi trực tiếp tệp video qua Messenger:', uploadErr.message || uploadErr);
           await safeSendMessage(
             api,
-            `⚠️ Không thể gửi tệp video trực tiếp qua Messenger (${uploadErr.message || 'vượt quá giới hạn dung lượng hoặc nghẽn mạng'}).\n👉 Bạn hãy bấm vào liên kết ở tin nhắn thông tin bên trên để xem hoặc tải video về máy nhé!`,
+            `Không thể gửi tệp video trực tiếp qua Messenger (${uploadErr.message || 'vượt quá giới hạn dung lượng hoặc nghẽn mạng'}).\nBạn hãy bấm vào liên kết ở tin nhắn thông tin bên trên để xem hoặc tải video về máy nhé!`,
             threadId,
             message?.messageID
           );
@@ -114,7 +114,7 @@ module.exports = {
       logger.error('Lỗi khi xử lý lệnh tải TikTok:', err.message || err);
       await safeSendMessage(
         api,
-        `❌ Có lỗi xảy ra khi xử lý video TikTok: ${err.message || 'Lỗi không xác định'}\nVui lòng kiểm tra lại liên kết video.`,
+        `Có lỗi xảy ra khi xử lý video TikTok: ${err.message || 'Lỗi không xác định'}\nVui lòng kiểm tra lại liên kết video.`,
         threadId,
         message?.messageID
       );

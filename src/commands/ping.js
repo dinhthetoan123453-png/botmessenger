@@ -14,7 +14,7 @@ module.exports = {
     const minutes = Math.floor((uptimeSec % 3600) / 60);
     const seconds = uptimeSec % 60;
 
-    const replyMsg = `🏓 Pong!\n` +
+    const replyMsg = `Pong!\n` +
       `• Độ trễ: ${Math.abs(latency)}ms\n` +
       `• Thời gian hoạt động: ${hours}h ${minutes}m ${seconds}s\n` +
       `• Trạng thái: Trực tuyến (Online)`;

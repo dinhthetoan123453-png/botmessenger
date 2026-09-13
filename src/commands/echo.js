@@ -8,7 +8,7 @@ module.exports = {
     if (!args || args.length === 0) {
       await safeSendMessage(
         api,
-        '📌 Vui lòng nhập nội dung muốn lặp lại. Ví dụ: !echo Xin chào Messenger Bot',
+        'Vui lòng nhập nội dung muốn lặp lại. Ví dụ: !echo Xin chào Messenger Bot',
         threadId,
         message?.messageID,
         isGroup !== undefined ? !isGroup : null
@@ -17,6 +17,6 @@ module.exports = {
     }
 
     const textToEcho = args.join(' ');
-    await safeSendMessage(api, `📢 Echo: ${textToEcho}`, threadId, message?.messageID, isGroup !== undefined ? !isGroup : null);
+    await safeSendMessage(api, `Echo: ${textToEcho}`, threadId, message?.messageID, isGroup !== undefined ? !isGroup : null);
   },
 };

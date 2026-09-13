@@ -18,7 +18,7 @@ module.exports = {
     if (!config.geminiApiKey) {
       await safeSendMessage(
         api,
-        '⚠️ Tính năng AI chưa được cấu hình.\nBạn vui lòng mở file .env và điền GEMINI_API_KEY (lấy hoàn toàn miễn phí tại https://aistudio.google.com/app/apikey).',
+        'Tính năng AI chưa được cấu hình.\nBạn vui lòng mở file .env và điền GEMINI_API_KEY (lấy hoàn toàn miễn phí tại https://aistudio.google.com/app/apikey).',
         threadId,
         message?.messageID
       );
@@ -51,7 +51,7 @@ module.exports = {
       const formatted = chatHistory.formatForPrompt(msgs);
       await safeSendMessage(
         api,
-        `📋 [LỊCH SỬ ${msgs.length} TIN NHẮN NGỮ CẢNH GẦN NHẤT]:\n\n${formatted}\n\n💡 AI sẽ tự động tham khảo các tin nhắn trên khi bạn gọi !ai.`,
+        `[LỊCH SỬ ${msgs.length} TIN NHẮN NGỮ CẢNH GẦN NHẤT]:\n\n${formatted}\n\nAI sẽ tự động tham khảo các tin nhắn trên khi bạn gọi !ai.`,
         threadId,
         message?.messageID
       );
@@ -147,7 +147,7 @@ Quy tắc phản hồi tối ưu:
       logger.error('Lỗi khi gọi Gemini API:', err);
       await safeSendMessage(
         api,
-        `❌ Lỗi xử lý AI: ${err.message || 'Không thể kết nối đến máy chủ AI.'}`,
+        `Lỗi xử lý AI: ${err.message || 'Không thể kết nối đến máy chủ AI.'}`,
         threadId,
         message?.messageID,
         isGroup !== undefined ? !isGroup : null

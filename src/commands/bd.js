@@ -34,7 +34,7 @@ module.exports = {
     // 1. Nếu người dùng chỉ gõ tên lệnh mà không nhập bất kỳ nội dung nào
     if (!contentAfterCmd) {
       const senderName = await getUserName(api, message?.senderID);
-      const helpMsg = `📌 Hướng dẫn sử dụng lệnh !bd (Đổi Biệt Danh):\n` +
+      const helpMsg = `Hướng dẫn sử dụng lệnh !bd (Đổi Biệt Danh):\n` +
         `• !bd <tên mới> : Đổi biệt danh của chính bạn\n` +
         `• !bd @user <tên mới> : Đổi biệt danh của người được tag\n` +
         `• !bd reset : Xóa biệt danh của bạn (về tên mặc định)\n` +
@@ -164,7 +164,7 @@ module.exports = {
     if (!isSelf && !newNickname) {
       return await safeSendMessage(
         api,
-        `⚠️ Vui lòng nhập biệt danh muốn đổi sau tên người được tag!\n` +
+        `Vui lòng nhập biệt danh muốn đổi sau tên người được tag!\n` +
         `Ví dụ: !bd @${targetName} Đẹp Trai\n` +
         `(Nếu muốn xóa biệt danh trở về ban đầu, hãy gõ: !bd @${targetName} reset)`,
         threadId,
@@ -184,14 +184,14 @@ module.exports = {
         if (isReset) {
           await safeSendMessage(
             api,
-            `✅ Đã xóa biệt danh của bạn (trở về tên mặc định Facebook).`,
+            `Đã xóa biệt danh của bạn (trở về tên mặc định Facebook).`,
             threadId,
             message?.messageID
           );
         } else {
           await safeSendMessage(
             api,
-            `✅ Đã đổi biệt danh của bạn thành: "${finalNickname}"`,
+            `Đã đổi biệt danh của bạn thành: "${finalNickname}"`,
             threadId,
             message?.messageID
           );
@@ -202,7 +202,7 @@ module.exports = {
           await safeSendMessage(
             api,
             {
-              body: `✅ Đã xóa biệt danh của ${displayTag} (trở về tên mặc định Facebook).`,
+              body: `Đã xóa biệt danh của ${displayTag} (trở về tên mặc định Facebook).`,
               mentions: [{ tag: displayTag, id: targetId }],
             },
             threadId,
@@ -212,7 +212,7 @@ module.exports = {
           await safeSendMessage(
             api,
             {
-              body: `✅ Đã đổi biệt danh của ${displayTag} thành: "${finalNickname}"`,
+              body: `Đã đổi biệt danh của ${displayTag} thành: "${finalNickname}"`,
               mentions: [{ tag: displayTag, id: targetId }],
             },
             threadId,
@@ -225,7 +225,7 @@ module.exports = {
 
       await safeSendMessage(
         api,
-        `❌ Không thể đổi biệt danh: ${err.message || 'Lỗi quyền hạn hoặc hạn chế từ Facebook.'}`,
+        `Không thể đổi biệt danh: ${err.message || 'Lỗi quyền hạn hoặc hạn chế từ Facebook.'}`,
         threadId,
         message?.messageID
       );

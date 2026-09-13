@@ -104,7 +104,7 @@ module.exports = {
       await safeSendMessage(
         api,
         {
-          body: `✨ Thẻ thông tin tài khoản Facebook của [${targetName}]`,
+          body: `Thẻ thông tin tài khoản Facebook của [${targetName}]`,
           attachments: [cardResult.imagePath],
         },
         threadId,
@@ -115,7 +115,7 @@ module.exports = {
 
       // Dự phòng gửi tin nhắn văn bản nếu lỗi tạo ảnh
       const targetName = await getUserName(api, targetId);
-      const fallbackMsg = `ℹ️ THÔNG TIN TÀI KHOẢN FACEBOOK:\n` +
+      const fallbackMsg = `THÔNG TIN TÀI KHOẢN FACEBOOK:\n` +
         `• Tên: ${targetName}\n` +
         `• UID Facebook: ${targetId}\n` +
         `• Trang cá nhân: https://facebook.com/${targetId}\n` +
