@@ -4,6 +4,7 @@
   "description": "Dự án Bot Facebook Messenger tài khoản cá nhân (Userbot) tích hợp AI Gemini, tải nhạc SoundCloud/Spotify và tải video TikTok",
   "main": "src/index.js",
   "scripts": {
+    "postinstall": "node scripts/patch-fca.js",
     "start": "node src/index.js",
     "dev": "node --watch src/index.js"
   },

@@ -1,5 +1,5 @@
 const { safeSendMessage } = require('../utils/messageHelper');
-const { getUserDetails, getUserName } = require('../utils/userHelper');
+const { getUserDetails, getUserName, getUserGender } = require('../utils/userHelper');
 const { generateInfoCard } = require('../utils/cardHelper');
 const logger = require('../utils/logger');
 
@@ -87,18 +87,8 @@ module.exports = {
       const targetName = user?.name || (await getUserName(api, targetId));
       const avatarUrl = user?.profilePicUrl || `https://graph.facebook.com/${targetId}/picture?width=512&height=512&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
-      // Xác định giới tính chuẩn xác
-      let genderText = null;
-      if (user?.gender) {
-        const g = String(user.gender).toLowerCase().trim();
-        if (g === 'male' || g === 'nam' || g === '2') {
-          genderText = 'Nam';
-        } else if (g === 'female' || g === 'nữ' || g === 'nu' || g === '1') {
-          genderText = 'Nữ';
-        } else if (g !== 'no specific gender') {
-          genderText = user.gender;
-        }
-      }
+      // Xác định giới tính chuẩn xác với cơ chế đa tầng
+      const genderText = await getUserGender(api, targetId, threadId, user);
 
       // 3. Tạo hình ảnh thẻ thông tin (Info Card)
       cardResult = await generateInfoCard({

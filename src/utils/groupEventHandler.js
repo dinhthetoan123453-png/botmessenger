@@ -1,6 +1,6 @@
 const config = require('../config');
 const { safeSendMessage } = require('./messageHelper');
-const { getUserDetails, getUserName } = require('./userHelper');
+const { getUserDetails, getUserName, getUserGender } = require('./userHelper');
 const { generateInfoCard } = require('./cardHelper');
 const logger = require('./logger');
 
@@ -66,15 +66,7 @@ async function handleGroupEvent({ api, event }) {
         const name = participant.fullName || user?.name || (await getUserName(api, userId));
         const avatarUrl = user?.profilePicUrl || `https://graph.facebook.com/${userId}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
-        let genderText = null;
-        if (user?.gender) {
-          const g = String(user.gender).toLowerCase().trim();
-          if (g === 'male' || g === 'nam' || g === '2') {
-            genderText = 'Nam';
-          } else if (g === 'female' || g === 'nữ' || g === 'nu' || g === '1') {
-            genderText = 'Nữ';
-          }
-        }
+        const genderText = await getUserGender(api, userId, threadId, user);
 
         cardResult = await generateInfoCard({
           name,
@@ -152,15 +144,7 @@ async function handleGroupEvent({ api, event }) {
       const user = await getUserDetails(api, leftUserId);
       const avatarUrl = user?.profilePicUrl || `https://graph.facebook.com/${leftUserId}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
-      let genderText = null;
-      if (user?.gender) {
-        const g = String(user.gender).toLowerCase().trim();
-        if (g === 'male' || g === 'nam' || g === '2') {
-          genderText = 'Nam';
-        } else if (g === 'female' || g === 'nữ' || g === 'nu' || g === '1') {
-          genderText = 'Nữ';
-        }
-      }
+      const genderText = await getUserGender(api, leftUserId, threadId, user);
 
       cardResult = await generateInfoCard({
         name: leftUserName,

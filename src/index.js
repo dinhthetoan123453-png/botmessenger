@@ -1,3 +1,8 @@
+// Tự động kiểm tra và vá lỗi thư viện ws3-fca trước khi khởi động bot
+try {
+  require('../scripts/patch-fca')();
+} catch (_) {}
+
 const net = require('net');
 const dns = require('dns');
 
