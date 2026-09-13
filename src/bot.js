@@ -124,26 +124,53 @@ function startBot(api) {
         if (command) {
           logger.bot(`Thực thi lệnh '${commandName}' từ [${senderName}] (Thread: ${threadId})`);
 
-          // Giả lập độ trễ an toàn trước khi phản hồi
+          // Giả lập độ trễ an toàn và hiển thị trạng thái "đang soạn tin nhắn..." để mô phỏng người thật
           const delay = getRandomDelay(config.safeDelayMin, config.safeDelayMax);
+          if (typeof api.sendTypingIndicator === 'function') {
+            try {
+              await api.sendTypingIndicator(true, threadId);
+            } catch (_) {}
+          }
           await sleep(delay);
 
-          await command.execute({
-            api,
-            message: event,
-            args,
-            threadId,
-            isGroup,
-          });
+          try {
+            await command.execute({
+              api,
+              message: event,
+              args,
+              threadId,
+              isGroup,
+            });
+          } finally {
+            if (typeof api.sendTypingIndicator === 'function') {
+              try {
+                await api.sendTypingIndicator(false, threadId);
+              } catch (_) {}
+            }
+          }
         } else {
           // Lệnh không tồn tại (chỉ thông báo trong chat riêng 1-1 để tránh spam nhóm chat)
           if (!isGroup) {
+            const delay = getRandomDelay(config.safeDelayMin, config.safeDelayMax);
+            if (typeof api.sendTypingIndicator === 'function') {
+              try {
+                await api.sendTypingIndicator(true, threadId);
+              } catch (_) {}
+            }
+            await sleep(delay);
+
             await safeSendMessage(
               api,
               `Lệnh '${prefixUsed}${commandName}' không tồn tại. Gõ '${prefixUsed}help' để xem danh sách lệnh.`,
               threadId,
               event.messageID
             );
+
+            if (typeof api.sendTypingIndicator === 'function') {
+              try {
+                await api.sendTypingIndicator(false, threadId);
+              } catch (_) {}
+            }
           }
         }
         return;
@@ -156,14 +183,28 @@ function startBot(api) {
         if (stikCmd) {
           logger.bot(`Tự động kích hoạt tải video TikTok từ liên kết của [${senderName}]`);
           const delay = getRandomDelay(config.safeDelayMin, config.safeDelayMax);
+          if (typeof api.sendTypingIndicator === 'function') {
+            try {
+              await api.sendTypingIndicator(true, threadId);
+            } catch (_) {}
+          }
           await sleep(delay);
-          await stikCmd.execute({
-            api,
-            message: event,
-            args: [directTikTokUrl],
-            threadId,
-            isGroup,
-          });
+
+          try {
+            await stikCmd.execute({
+              api,
+              message: event,
+              args: [directTikTokUrl],
+              threadId,
+              isGroup,
+            });
+          } finally {
+            if (typeof api.sendTypingIndicator === 'function') {
+              try {
+                await api.sendTypingIndicator(false, threadId);
+              } catch (_) {}
+            }
+          }
           return;
         }
       }
@@ -175,16 +216,29 @@ function startBot(api) {
         if (aiCmd) {
           logger.bot(`Tự động phản hồi AI cho [${senderName}] trong chat riêng 1-1`);
           const delay = getRandomDelay(config.safeDelayMin, config.safeDelayMax);
+          if (typeof api.sendTypingIndicator === 'function') {
+            try {
+              await api.sendTypingIndicator(true, threadId);
+            } catch (_) {}
+          }
           await sleep(delay);
 
-          await aiCmd.execute({
-            api,
-            message: event,
-            args: rawContent ? rawContent.split(/\s+/) : [],
-            threadId,
-            isGroup,
-            isAutoReply: true,
-          });
+          try {
+            await aiCmd.execute({
+              api,
+              message: event,
+              args: rawContent ? rawContent.split(/\s+/) : [],
+              threadId,
+              isGroup,
+              isAutoReply: true,
+            });
+          } finally {
+            if (typeof api.sendTypingIndicator === 'function') {
+              try {
+                await api.sendTypingIndicator(false, threadId);
+              } catch (_) {}
+            }
+          }
         }
       }
     } catch (err) {

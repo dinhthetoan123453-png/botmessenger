@@ -104,6 +104,10 @@ module.exports = {
       }
 
       // 3. Gọi Gemini API với chỉ dẫn hệ thống tối ưu phong cách chat Messenger
+      if (typeof api.sendTypingIndicator === 'function') {
+        try { await api.sendTypingIndicator(true, threadId); } catch (_) {}
+      }
+
       const response = await aiClient.models.generateContent({
         model: config.geminiModel,
         contents,
@@ -147,6 +151,10 @@ Quy tắc phản hồi tối ưu:
         threadId,
         message?.messageID
       );
+    } finally {
+      if (typeof api.sendTypingIndicator === 'function') {
+        try { await api.sendTypingIndicator(false, threadId); } catch (_) {}
+      }
     }
   },
 };

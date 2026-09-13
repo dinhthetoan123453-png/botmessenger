@@ -1,7 +1,16 @@
+const config = require('../config');
 const { safeSendMessage } = require('./messageHelper');
 const { getUserDetails, getUserName } = require('./userHelper');
 const { generateInfoCard } = require('./cardHelper');
 const logger = require('./logger');
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getRandomDelay(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 /**
  * Xử lý sự kiện khi có thành viên tham gia hoặc rời nhóm
@@ -35,6 +44,7 @@ async function handleGroupEvent({ api, event }) {
 
       // Nếu chính tài khoản bot được thêm vào nhóm
       if (userId === botId) {
+        await sleep(getRandomDelay(config.safeDelayMin, config.safeDelayMax));
         await safeSendMessage(
           api,
           `🤖 Xin chào cả nhà! Cảm ơn mọi người đã thêm Bot vào nhóm chat [${threadName}].\n` +
@@ -47,6 +57,11 @@ async function handleGroupEvent({ api, event }) {
       // Với thành viên mới: Tạo ảnh thẻ chào mừng phong cách Gojo (Welcome Card)
       let cardResult = null;
       try {
+        if (typeof api.sendTypingIndicator === 'function') {
+          try { await api.sendTypingIndicator(true, threadId); } catch (_) {}
+        }
+        await sleep(getRandomDelay(config.safeDelayMin, config.safeDelayMax));
+
         const user = await getUserDetails(api, userId);
         const name = participant.fullName || user?.name || (await getUserName(api, userId));
         const avatarUrl = user?.profilePicUrl || `https://graph.facebook.com/${userId}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
@@ -99,6 +114,9 @@ async function handleGroupEvent({ api, event }) {
       } catch (err) {
         logger.error(`Lỗi khi tạo thẻ chào mừng thành viên ${userId}:`, err.message || err);
       } finally {
+        if (typeof api.sendTypingIndicator === 'function') {
+          try { await api.sendTypingIndicator(false, threadId); } catch (_) {}
+        }
         if (cardResult && typeof cardResult.cleanup === 'function') {
           cardResult.cleanup();
         }
@@ -125,6 +143,11 @@ async function handleGroupEvent({ api, event }) {
 
     let cardResult = null;
     try {
+      if (typeof api.sendTypingIndicator === 'function') {
+        try { await api.sendTypingIndicator(true, threadId); } catch (_) {}
+      }
+      await sleep(getRandomDelay(config.safeDelayMin, config.safeDelayMax));
+
       const leftUserName = (await getUserName(api, leftUserId)) || 'Thành viên';
       const user = await getUserDetails(api, leftUserId);
       const avatarUrl = user?.profilePicUrl || `https://graph.facebook.com/${leftUserId}/picture?width=720&height=720&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
@@ -176,6 +199,9 @@ async function handleGroupEvent({ api, event }) {
     } catch (err) {
       logger.error(`Lỗi khi tạo thẻ tạm biệt thành viên ${leftUserId}:`, err.message || err);
     } finally {
+      if (typeof api.sendTypingIndicator === 'function') {
+        try { await api.sendTypingIndicator(false, threadId); } catch (_) {}
+      }
       if (cardResult && typeof cardResult.cleanup === 'function') {
         cardResult.cleanup();
       }
