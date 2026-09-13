@@ -225,7 +225,55 @@ function startBot(api) {
         }
       }
 
-      // 5. Tự động phản hồi bằng AI trong chat riêng 1-1 (nếu bật AUTO_REPLY_AI=true)
+      // 5. Tự động phản hồi bằng AI khi người dùng @tag bot hoặc reply tin nhắn của bot trong nhóm chat
+      const isBotMentioned = Boolean(
+        (event.mentions && (event.mentions[String(botId)] || Object.prototype.hasOwnProperty.call(event.mentions, String(botId)))) ||
+        /@(?:bot|cat\s*nyan)\b/i.test(rawContent)
+      );
+      const isReplyToBot = Boolean(
+        isGroup &&
+        event.messageReply &&
+        String(event.messageReply.senderID) === String(botId)
+      );
+
+      if (isGroup && (isBotMentioned || isReplyToBot) && config.geminiApiKey) {
+        const aiCmd = commands.get('ai');
+        if (aiCmd) {
+          logger.bot(`[AI] Nhận diện ${isBotMentioned ? '@tag bot' : 'reply tin nhắn bot'} trong nhóm từ [${senderName}] (Thread: ${threadId})`);
+
+          // Làm sạch chuỗi câu hỏi: loại bỏ phần tag tên bot để AI tập trung vào nội dung chính
+          let cleanPrompt = rawContent;
+          if (event.mentions && event.mentions[String(botId)]) {
+            cleanPrompt = cleanPrompt.replace(event.mentions[String(botId)], '').trim();
+          }
+          cleanPrompt = cleanPrompt.replace(/@(?:bot|cat\s*nyan)\b/gi, '').trim();
+          cleanPrompt = cleanPrompt.replace(/^@\S+\s*/, '').trim();
+
+          const delay = getRandomDelay(config.safeDelayMin, config.safeDelayMax);
+          if (typeof api.sendTypingIndicator === 'function') {
+            try { await api.sendTypingIndicator(true, threadId); } catch (_) {}
+          }
+          await sleep(delay);
+
+          try {
+            await aiCmd.execute({
+              api,
+              message: event,
+              args: cleanPrompt ? cleanPrompt.split(/\s+/) : [],
+              threadId,
+              isGroup,
+              isAutoReply: true,
+            });
+          } finally {
+            if (typeof api.sendTypingIndicator === 'function') {
+              try { await api.sendTypingIndicator(false, threadId); } catch (_) {}
+            }
+          }
+          return;
+        }
+      }
+
+      // 6. Tự động phản hồi bằng AI trong chat riêng 1-1 (nếu bật AUTO_REPLY_AI=true)
       const shouldAutoTriggerAI = !isGroup && config.autoReplyAi;
       if (shouldAutoTriggerAI && config.geminiApiKey) {
         const aiCmd = commands.get('ai');

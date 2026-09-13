@@ -83,9 +83,12 @@ module.exports = {
 
       // Kiểm tra nếu không có câu hỏi VÀ cũng chưa có bất kỳ tin nhắn lịch sử nào
       if (!userPrompt && previousMessages.length === 0) {
+        const defaultPromptMsg = isAutoReply
+          ? 'Gì đấy mày? Cần gì thì nói luôn đi.'
+          : 'Vui lòng nhập câu hỏi sau lệnh !ai (Ví dụ: !ai giải thích tại sao bầu trời màu xanh?) hoặc trò chuyện trước để AI nắm bắt ngữ cảnh.';
         await safeSendMessage(
           api,
-          'Vui lòng nhập câu hỏi sau lệnh !ai (Ví dụ: !ai giải thích tại sao bầu trời màu xanh?) hoặc trò chuyện trước để AI nắm bắt ngữ cảnh.',
+          defaultPromptMsg,
           threadId,
           message?.messageID
         );
