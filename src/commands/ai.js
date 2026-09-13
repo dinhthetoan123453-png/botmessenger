@@ -10,6 +10,13 @@ if (config.geminiApiKey) {
   aiClient = new GoogleGenAI({ apiKey: config.geminiApiKey });
 }
 
+const AI_SYSTEM_PROMPT = `Xưng hô: tao/mày, t/m. Nói ngắn, tự nhiên, như nhắn story hay rep comment.
+Hơi cà khịa, hơi miệng, được chửi thề nhẹ: vcl, đm, wtf, no cap, fr. Không khách sáo, không “dạ thưa”, không giọng chatbot.
+Nói kiểu meme: deadpan, hơi mỉa, caption ngắn. Được dùng: ảo, căng, toang, suy, hết cứu, L, W, npc, main character, it's giving, the way, bro really, ratio, slay, cope, real, nma, nx, cx.
+Vẫn nói chuyện bình thường được, tư vấn được. Hỗn là hỗn thân, troll nhẹ, không công kích vô cớ cả ngày.
+Nếu người dùng nhờ chửi ai: chửi kiểu meme, cay vừa, hài vừa, 1–2 đoạn là đủ. Đừng viết văn tế tục.
+Không xin lỗi vì giọng này. Đây là default.`;
+
 module.exports = {
   name: 'ai',
   description: 'Hỏi đáp với AI Google Gemini (đọc 8 tin nhắn gần nhất để nắm bắt ngữ cảnh)',
@@ -92,18 +99,18 @@ module.exports = {
       if (isAutoReply) {
         const latestMsg = userPrompt || rawCurrent;
         contents = (historyText ? `[BỐI CẢNH ${previousMessages.length} TIN NHẮN TRƯỚC ĐÓ TRONG CUỘC TRÒ CHUYỆN]:\n${historyText}\n\n` : '') +
-          `[TIN NHẮN MỚI NHẤT VỪA NHẬN TỪ "${senderName}"]:\n"${latestMsg}"\n\n` +
-          `[YÊU CẦU]:\nBạn là chủ tài khoản Facebook cá nhân đang trò chuyện 1-1 với "${senderName}". Hãy đọc kỹ bối cảnh và phản hồi lại tin nhắn mới nhất trên một cách tự nhiên, thân thiện, ngắn gọn như người thật đang nhắn tin Messenger.`;
+          `[TIN NHẮN MỚI NHẤT TỪ "${senderName}"]:\n"${latestMsg}"\n\n` +
+          `[CHỈ THỊ]:\nPhản hồi lại tin nhắn mới nhất trên theo đúng phong cách và xưng hô đã được chỉ thị.`;
       } else if (userPrompt) {
         contents = (historyText ? `[BỐI CẢNH ${previousMessages.length} TIN NHẮN GẦN NHẤT TRONG CUỘC TRÒ CHUYỆN]:\n${historyText}\n\n` : '') +
-          `[CÂU HỎI / YÊU CẦU MỚI NHẤT TỪ "${senderName}"]:\n"${userPrompt}"\n\n` +
-          `[YÊU CẦU]:\nHãy phân tích kỹ bối cảnh các tin nhắn trên (nếu có) để trả lời câu hỏi mới nhất một cách tối ưu, tự nhiên, chính xác và súc tích nhất cho tin nhắn Messenger.`;
+          `[TIN NHẮN / YÊU CẦU MỚI NHẤT TỪ "${senderName}"]:\n"${userPrompt}"\n\n` +
+          `[CHỈ THỊ]:\nTrả lời câu hỏi hoặc yêu cầu trên theo đúng phong cách và xưng hô đã được chỉ thị.`;
       } else {
         contents = `[BỐI CẢNH ${previousMessages.length} TIN NHẮN GẦN NHẤT TRONG CUỘC TRÒ CHUYỆN]:\n${historyText}\n\n` +
-          `[YÊU CẦU]:\nNgười dùng "${senderName}" vừa gọi AI hỗ trợ. Hãy phân tích kỹ các tin nhắn gần nhất trên và đưa ra câu trả lời hoặc phản hồi tối ưu nhất để tiếp nối, giải quyết vấn đề mọi người đang bàn luận trong cuộc trò chuyện.`;
+          `[CHỈ THỊ]:\nNgười dùng "${senderName}" vừa gọi bạn. Hãy đọc các tin nhắn gần nhất và tiếp nối cuộc trò chuyện theo đúng phong cách và xưng hô đã được chỉ thị.`;
       }
 
-      // 3. Gọi Gemini API với chỉ dẫn hệ thống tối ưu phong cách chat Messenger
+      // 3. Gọi Gemini API với chỉ dẫn hệ thống theo đúng phong cách yêu cầu
       if (typeof api.sendTypingIndicator === 'function') {
         try { await api.sendTypingIndicator(true, threadId); } catch (_) {}
       }
@@ -112,13 +119,13 @@ module.exports = {
         model: config.geminiModel,
         contents,
         config: {
-          systemInstruction: `Bạn là trợ lý AI thông minh trên ứng dụng Facebook Messenger.
-Nhiệm vụ của bạn: Đọc và hiểu sâu bối cảnh tin nhắn gần nhất để tối ưu câu trả lời cho người dùng.
-
-Quy tắc phản hồi tối ưu:
-- Hiểu ngữ cảnh: Nhận diện chủ đề đang bàn luận, xưng hô phù hợp, giải mã các đại từ thay thế (ví dụ: "chỗ đó", "nó", "quán đấy", "ai", "bao nhiêu").
-- Phong cách nhắn tin Messenger: Trả lời bằng tiếng Việt tự nhiên, thân thiện, ngắn gọn, súc tích, đi thẳng vào trọng tâm (1-3 câu hoặc vài gạch đầu dòng rõ ràng).
-- Trực tiếp giải quyết câu hỏi hoặc nhu cầu của người dùng.`,
+          systemInstruction: AI_SYSTEM_PROMPT,
+          safetySettings: [
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_ONLY_HIGH' },
+          ],
         },
       });
 
