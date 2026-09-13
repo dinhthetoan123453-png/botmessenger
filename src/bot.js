@@ -36,6 +36,7 @@ function isBotSystemMessage(content) {
          text.startsWith('❌ ') ||
          text.startsWith('📌 ') ||
          text.startsWith('🎶 Audio:') ||
+         text.startsWith('DANH SÁCH LỆNH') ||
          text.startsWith('🤖 DANH SÁCH LỆNH') ||
          text.startsWith('ℹ️ THÔNG TIN CUỘC TRÒ CHUYỆN:') ||
          text.startsWith("Lệnh '") ||
