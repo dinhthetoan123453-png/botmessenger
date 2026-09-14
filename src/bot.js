@@ -98,9 +98,14 @@ function startBot(api, onFatalError = null) {
 
       // 2. Chỉ xử lý tin nhắn dạng tin nhắn thường (message) hoặc phản hồi tin nhắn (message_reply)
       if (event.type !== 'message' && event.type !== 'message_reply') return;
-      if (!event.body || typeof event.body !== 'string') return;
 
-      const rawContent = event.body.trim();
+      const rawContent = (typeof event.body === 'string' ? event.body : '').trim();
+      const hasAttachments = Array.isArray(event.attachments) && event.attachments.length > 0;
+      const hasReplyAttachments = Boolean(event.messageReply && Array.isArray(event.messageReply.attachments) && event.messageReply.attachments.length > 0);
+
+      // Nếu không có nội dung chữ và cũng không có bất kỳ tệp đính kèm nào thì bỏ qua
+      if (!rawContent && !hasAttachments && !hasReplyAttachments) return;
+
       const threadId = String(event.threadID);
       const senderId = String(event.senderID);
       const isGroup = Boolean(event.isGroup);
@@ -113,7 +118,8 @@ function startBot(api, onFatalError = null) {
       const senderName = await getUserName(api, senderId);
 
       // In log tin nhắn nhận được ra terminal theo thời gian thực
-      logger.msg(`[${isGroup ? 'Nhóm' : 'Riêng'}] ${senderName}: "${rawContent}"`);
+      const logContent = rawContent || (hasAttachments ? `[Đính kèm ${event.attachments.length} tệp/ảnh]` : '[Không có văn bản]');
+      logger.msg(`[${isGroup ? 'Nhóm' : 'Riêng'}] ${senderName}: "${logContent}"`);
 
       // Kiểm tra xem tin nhắn có bắt đầu bằng tiền tố lệnh không (hỗ trợ cả config.prefix, /, !)
       let prefixUsed = null;
@@ -129,12 +135,15 @@ function startBot(api, onFatalError = null) {
 
       // Lưu tin nhắn vào lịch sử nếu không phải lệnh và không phải tin hệ thống
       if (!isCommand && !isBotSystemMessage(rawContent)) {
-        chatHistory.addMessage(threadId, {
-          sender: senderName,
-          content: rawContent,
-          isSelf: false,
-          timestamp: Number(event.timestamp) || Date.now(),
-        });
+        const historyText = rawContent || (hasAttachments ? '[Đã gửi một hình ảnh]' : '');
+        if (historyText) {
+          chatHistory.addMessage(threadId, {
+            sender: senderName,
+            content: historyText,
+            isSelf: false,
+            timestamp: Number(event.timestamp) || Date.now(),
+          });
+        }
       }
 
       // 3. Xử lý lệnh
